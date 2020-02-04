@@ -6,12 +6,14 @@ import ErrorIndicator from '../error-indicator';
 import PeoplePage from '../people-page/people-page';
 
 import './app.css';
+import ItemList from '../item-list';
+import PersonDetails from '../person-details';
+import SwapiService from '../../services/swapi-service';
 
 /*
   1. Создать компонента заглушки (верста стилизация )
   2. После создания компонента заглушки необходимо определить,
   каким будет state у этого компонента
-
 
   ! * React работа с серверным Api
   1. React(Ui библиотека) и ничего не знает о работе с сервером - это задача других библиотек
@@ -110,6 +112,9 @@ import './app.css';
 */
 
 export default class App extends Component {
+  // * Инициализация класс-сервиса, для работы с сервером
+  swapiService = new SwapiService();
+
   state = {
     showRandomPlanet: true, // Показывать случайную планету
     hasError: false, // Была ли ошибка в компонентах
@@ -156,6 +161,38 @@ export default class App extends Component {
         {/* PeoplePage - для оборачивания, если компонент выходит из
         строя, то только ломаться будет только он, а не все приложение */}
         <PeoplePage />
+
+        <div className='row mb2'>
+          <div className='col-md-6'>
+            <ItemList
+              onItemSelected={this.onPersonSelected}
+              getData={this.swapiService.getAllPlanets}
+              renderItem={(item) => (
+                <span>
+                  {item.name} <b>{`diameter: ${item.diameter}`}</b>
+                </span>
+              )}
+            />
+          </div>
+
+          <div className='col-md-6'>
+            <PersonDetails personId={this.state.selectedPerson} />
+          </div>
+        </div>
+
+        <div className='row mb2'>
+          <div className='col-md-6'>
+            <ItemList
+              onItemSelected={this.onPersonSelected}
+              getData={this.swapiService.getAllStarships}
+              renderItem={({ name }) => name}
+            />
+          </div>
+
+          <div className='col-md-6'>
+            <PersonDetails personId={this.state.getAllPlanets} />
+          </div>
+        </div>
       </div>
     );
   }
