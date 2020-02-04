@@ -76,7 +76,7 @@ export default class SwapiService {
   // * Функция трансформация данных от Api (Startship)
   // Преобразует получаемый объект с сервера
   // в новый объект под необходимый нам формат, и отбрасываем лишние поля
-  _transformStartships = (startship) => {
+  _transformStarships = (startship) => {
     return {
       id: this._extractId(startship),
       name: startship.name,
@@ -90,41 +90,45 @@ export default class SwapiService {
     };
   };
 
+  // ! Если функции получения данных будут передаваться через
+  // ! Свойства компонента (PeoplePage), то необходимо следить за this,
+  // ! и использовать стрелочные функции
+
   // * Все персонажи
-  async getAllPeople() {
+  getAllPeople = async () => {
     const people = await this.getResource(`/people/`);
     return people.results.map(this._transformPerson);
-  }
+  };
 
   // * Конкретный персонаж
-  async getPerson(id) {
+  getPerson = async (id) => {
     const person = await this.getResource(`/people/${id}/`);
     return this._transformPerson(person);
-  }
+  };
 
   // * Все планеты
-  async getAllPlanets() {
+  getAllPlanets = async () => {
     const planets = await this.getResource(`/planets/`);
-    return planets.result.map(this._transformPlanet);
-  }
+    return planets.results.map(this._transformPlanet);
+  };
 
   // * Конкретная планета
-  async getPlanet(id) {
+  getPlanet = async (id) => {
     const planet = await this.getResource(`/planets/${id}/`);
     return this._transformPlanet(planet);
-  }
+  };
 
   // * Все корабли
-  async getAllStartships() {
-    const startships = await this.getResource(`/startships/`);
-    return startships.result.map(this._transformStartships);
-  }
+  getAllStarships = async () => {
+    const starships = await this.getResource(`/starships/`);
+    return starships.results.map(this._transformStarships);
+  };
 
   // * Конкретный корабль
-  async getShips(id) {
-    const ship = await this.getResource(`/startships/${id}/`);
-    return this._transformStartships(ship);
-  }
+  getShips = async (id) => {
+    const ship = await this.getResource(`/starships/${id}/`);
+    return this._transformStarships(ship);
+  };
 }
 
 // # Пример использования
