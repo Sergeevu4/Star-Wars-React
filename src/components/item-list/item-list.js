@@ -1,28 +1,27 @@
 import React, { Component } from 'react';
-import SwapiService from '../../services/swapi-service';
 import Spinner from '../spinner/spinner';
 import ErrorIndicator from '../error-indicator';
 
 import './item-list.css';
 
+// # Обобщенный класс, предназначенный для отрисовки списка: Персонажей, Планет, Кораблей,
 export default class ItemList extends Component {
-  // * Инициализация класс-сервиса, для работы с сервером
-  swapiService = new SwapiService();
-
   // * Первоначальное состояние
   state = {
-    peopleList: null,
+    itemList: null,
     hasError: false,
   };
 
   // * Компонент вставлен в DOM
   componentDidMount() {
-    // Асинхронная загрузка (всех Персонажей) и преобразования данных, запись в state
-    this.swapiService
-      .getAllPeople()
-      .then((peopleList) => {
+    // Асинхронная (Promise) функция для получения данных
+    // (Список элементов) this.swapiService.getAllPeople
+    const { getData } = this.props;
+
+    getData()
+      .then((itemList) => {
         this.setState({
-          peopleList,
+          itemList,
         });
       })
       .catch((err) => {
@@ -34,32 +33,43 @@ export default class ItemList extends Component {
     this.setState({ hasError: true });
   }
 
-  // * Оптимизации функции в компоненте
+  // ! Возможная оптимизации функций Handler в компоненте
   // Теперь анонимная функция не будет создаваться каждый раз
-  //  onClick={ () => {this.props.onItemSelected(id);}}
-  onItemSelected = (id) => (event) => {
-    this.props.onItemSelected(id);
-  };
+  // onItemSelected = (id) => (event) => {
+  //   this.props.onItemSelected(id);
+  // };
+  // onClick={this.onItemSelected(id)}
 
   // * Функция по созданию React элементов
-  renderItems(people) {
-    return people.map(({ id, name }) => {
+  renderItems(arr) {
+    // label -> Функция которая будет передана в map,
+    // для индуал. отрисовки свойств или значений в <li>.
+    // Которые получают через сервер
+    const label = this.props.renderItem;
+
+    return arr.map((item) => {
+      const { id } = item;
+
       return (
         <li
           key={id}
           className='list-group-item'
-          // Обработчик из App
-          onClick={this.onItemSelected(id)}
+          // Обработчик из Обертки Page
+          onClick={() => {
+            this.props.onItemSelected(id);
+          }}
         >
-          {name}
+          {label(item)}
         </li>
       );
     });
   }
-  render() {
-    const { peopleList, hasError } = this.state;
 
-    if (!peopleList) {
+  render() {
+    const { itemList, hasError } = this.state;
+
+    // Если данные еще не получены отображается spinner
+    if (!itemList) {
       return <Spinner />;
     }
 
@@ -67,8 +77,8 @@ export default class ItemList extends Component {
       return <ErrorIndicator />;
     }
 
-    const items = this.renderItems(peopleList);
-
+    // Если загрузка завершилась и нет ошибки:
+    const items = this.renderItems(itemList);
     return <ul className='item-list list-group'>{items}</ul>;
   }
 }
