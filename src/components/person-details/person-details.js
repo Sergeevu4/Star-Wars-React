@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import './person-details.css';
 import SwapiService from '../../services/swapi-service';
 import Spinner from '../spinner/spinner';
-import ErrorIndicator from '../error-indicator';
 import ErrorButton from '../error-button';
 
 export default class PersonDetails extends Component {
+  // * Инициализация класс-сервиса, для работы с сервером
   swapiService = new SwapiService();
 
   // Реализация Spinner через публичное поле класса

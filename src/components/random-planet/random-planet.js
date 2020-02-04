@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import SwapiService from '../../services/swapi-service';
 import Spinner from '../spinner/spinner';
-import ErrorIndicator from '../error-indicator/error-indicator';
+import ErrorIndicator from '../error-indicator';
 
 import './random-planet.css';
 
