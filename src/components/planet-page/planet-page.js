@@ -1,20 +1,17 @@
 import React, { Component } from 'react';
 import ItemList from '../item-list';
-import PersonDetails from '../person-details';
+import ItemsDetails from '../items-details';
 import ErrorIndicator from '../error-indicator';
-
-import './planet-page.css';
 import SwapiService from '../../services/swapi-service';
 
-// Функция, может инкапсулировать получение данных
-// (тогда компонент становится независимым от источника данных)
+import './planet-page.css';
 
 export default class PlanetPage extends Component {
   // * Инициализация класс-сервиса, для работы с сервером
   swapiService = new SwapiService();
 
   state = {
-    // Выбранный первоначально id персонажа
+    // Выбранный первоначально id планеты или null
     selectedPerson: null,
     hasError: false,
   };
@@ -40,12 +37,15 @@ export default class PlanetPage extends Component {
         <div className='col-md-6'>
           <ItemList
             onItemSelected={this.onPersonSelected}
-            getData={this.swapiService.getAllPeople}
+            // # Паттерн React: Использование функция при передачи внутрь компонентов
+            // Функция, может инкапсулировать получение данных
+            // (тогда компонент становится независимым от источника данных)
+            getData={this.swapiService.getAllPlanets}
           />
         </div>
 
         <div className='col-md-6'>
-          <PersonDetails personId={this.state.selectedPerson} />
+          <ItemsDetails personId={this.state.selectedPerson} />
         </div>
       </div>
     );
