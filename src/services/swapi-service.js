@@ -20,6 +20,9 @@ export default class SwapiService {
   // Приватная часть, которую нельзя менять и использовать снаружи
   _apiBase = 'https://swapi.co/api'; // Публичное поле
 
+  // Адрес для получения картинок
+  _imageBase = 'https://starwars-visualguide.com/assets/img';
+
   // ! Необходимо проверять каким образом объявлен метод, чтобы не терять this
   // Пример внутри обычного метода id: this._extractId(planet) вызывал ошибку
 
@@ -51,8 +54,11 @@ export default class SwapiService {
   // Преобразует получаемый объект с сервера
   // в новый объект под необходимый нам формат, и отбрасываем лишние поля
   _transformPlanet = (planet) => {
+    const id = this._extractId(planet);
+
     return {
-      id: this._extractId(planet),
+      id,
+      image: `${this._imageBase}/planets/${id}.jpg`,
       name: planet.name,
       population: planet.population,
       rotationPeriod: planet.rotation_period,
@@ -64,8 +70,11 @@ export default class SwapiService {
   // Преобразует получаемый объект с сервера
   // в новый объект под необходимый нам формат, и отбрасываем лишние поля
   _transformPerson = (person) => {
+    const id = this._extractId(person);
+
     return {
-      id: this._extractId(person),
+      id,
+      image: `${this._imageBase}/characters/${id}.jpg`,
       gender: person.gender,
       name: person.name,
       birthYear: person.birth_year,
@@ -77,8 +86,11 @@ export default class SwapiService {
   // Преобразует получаемый объект с сервера
   // в новый объект под необходимый нам формат, и отбрасываем лишние поля
   _transformStarships = (startship) => {
+    const id = this._extractId(startship);
+
     return {
-      id: this._extractId(startship),
+      id,
+      image: `${this._imageBase}/starships/${id}.jpg`,
       name: startship.name,
       model: startship.model,
       manufacturer: startship.manufacturer,
@@ -129,6 +141,23 @@ export default class SwapiService {
     const ship = await this.getResource(`/starships/${id}/`);
     return this._transformStarships(ship);
   };
+
+  // ! Функции получения изображения можно заменить
+  // ! На получения их сразу при вызове функций трансформации данных от Api
+  // * Получения Картинки по id Персонажа
+  // getPersonImage = (id) => {
+  //   return `${this._imageBase}/characters/${id}.jpg`;
+  // };
+
+  // // * Получения Картинки по id Корабля
+  // getStarshipImage = (id) => {
+  //   return `${this._imageBase}/starships/${id}.jpg`;
+  // };
+
+  // // * Получения Картинки по id Планеты
+  // getPlanetImage = (id) => {
+  //   return `${this._imageBase}/planets/${id}.jpg`;
+  // };
 }
 
 // # Пример использования
