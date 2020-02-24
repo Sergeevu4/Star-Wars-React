@@ -4,27 +4,34 @@ import RandomPlanet from '../random-planet';
 import ErrorButton from '../error-button';
 import ErrorIndicator from '../error-indicator';
 import PeoplePage from '../people-page/people-page';
+import SwapiService from '../../services/swapi-service';
+import ErrorBoundry from '../error-boundry';
 
 import './app.css';
-import ItemList from '../item-list';
-import PersonDetails from '../person-details';
-import SwapiService from '../../services/swapi-service';
+import Row from '../row';
+import ItemsDetails, { Record } from '../items-details/';
+
+// import ItemList from '../item-list';
+// import PersonDetails from '../person-details';
 
 /*
-  1. Создать компонента заглушки (верста стилизация )
+  1. Создать компонента заглушки (верста и стилизация)
   2. После создания компонента заглушки необходимо определить,
   каким будет state у этого компонента
 
   ! * React работа с серверным Api
-  1. React(Ui библиотека) и ничего не знает о работе с сервером - это задача других библиотек
-  2. Сетевой код следует изолировать от кода компонента
-  3. Если необходимо, трансформировать данные от Api до того, как их получит компонент,
-  то это стоит делать не в компоненте, а в сетевом коде, который изолирован от них.
-  Компоненты должно работать уже с правильной структурой. моделью данных
-  4. При работе сетью, данные доступны не сразу или вовсе могут быть недоступны, поэтому
-  необходимо обрабатывать состояние "Загрузка" и "Ошибка"
-! 5. Разделать ответственность компонентов: Логику и Рендаринг (пример: RandomPlanet)
+    1. React(Ui библиотека) и ничего не знает о работе с сервером - это задача других библиотек
+    2. Сетевой код следует изолировать от кода компонента
+    3. Если необходимо, трансформировать данные от Api до того, как их получит компонент,
+    то это стоит делать не в компоненте, а в сетевом коде, который изолирован от них.
+    Компоненты должно работать уже с правильной структурой, моделью данных
+    4. При работе сетью, данные доступны не сразу или вовсе могут быть недоступны, поэтому
+    необходимо обрабатывать состояние "Загрузка" и "Ошибка"
+  ! 5. Разделять ответственность компонентов: Логику и Рендаринг (пример: RandomPlanet)
 
+  ! React элементы нельзя изменять после того как они были созданы
+    ?  НО можно создавать модифицированные копии при помощи React.cloneElement(child, {})
+    ? и добавлять дополнительные свойства к тему которые там уже определены
 
   ! Функции жизненного цикла:
 
@@ -42,7 +49,7 @@ import SwapiService from '../../services/swapi-service';
 
     componentDidMount - после того, как компонент "подключен"
     (Dom элементы находится на странице)
-      Вызывается один раз, до того как компонент снова не удалят и не вставят.
+      Вызывается один раз, до того как компонент снова не удалят и вставят.
 
       ? Используется:
       - Первоначальная Инициализация компонента, который зависит
@@ -54,19 +61,18 @@ import SwapiService from '../../services/swapi-service';
 
   # UPDATES - компонент может получать обновление и обновляется
     New Props - пришли новые свойства
-                => render() => componentDidUpdate(prevProps, prevState)
+                 => render() => componentDidUpdate(prevProps, prevState)
     setState() - вызов обновления состояния
 
     Не вызывается в момент первого render компонента.
     Вызывается после того, как компонент обновился, state уже новый, render сработал,
-    поэтому он принимает предыдущие версии props, state
+    поэтому он принимает предыдущие версии prevProps, prevState
 
     ? Используется:
       - Для запроса новых данных для обновления состояния
 
     ! Если компоненту ничего не нужно делать при обновлении свойств и state, то и componentDidUpdate не нужен,
     ! componentDidUpdate() это возможность среагировать на изменение свойств или состояния компонента
-     https://www.udemy.com/course/pro-react-redux/learn/lecture/11976172#questions/6594786
 
     componentDidUpdate срабатывает тогда, когда свойства компонента изменили, в том числе, снаружи.
     Сам компонент контролирует только свой state, props же ему передают "сверху".
@@ -137,32 +143,86 @@ export default class App extends Component {
   render() {
     // ! null игнорируется jsx
     // Показывать или скрывать случайную планету
-    const randomPlanet = this.state.showRandomPlanet ? <RandomPlanet /> : null;
+    // const randomPlanet = this.state.showRandomPlanet ? <RandomPlanet /> : null;
 
     if (this.state.hasError) {
       return <ErrorIndicator />;
     }
 
+    // Функции получения персонажа и корабля
+    const { getPerson, getShips } = this.swapiService;
+
+    /*
+      # Паттерн React: Работа с props.children + клонирования свойств
+      Что должно отображаться внутри ItemsDetails
+      Так как он стал (обощенный) компонентом
+
+      Record -> li принимает значение для отображения определенных характеристик того, что мы хотим отрендарить,
+      она разная в зависимости от загружаемых данных:
+      корабль, персонаж или планета
+
+      Для того чтобы извлечь эти данные, нам нужен объект item
+      который получаем внутри items-details через React.Children.map + React.cloneElement - (так как React элементы имутабельны)
+      filed - это ключ для информации item[filed], label название колонки
+
+      * Record - можно было заменить:
+        <ItemsDetails
+          ...
+          fields = {
+            [
+              { filed='gender' label='Gender' },
+              { filed='eyeColor' label='Eye Color' }
+            ]
+          }
+        />
+      * Но подобное решение не в духе React, ведь он построен на идеи
+      * компонентов которые описывают внешний вид приложения
+    */
+
+    const personDetails = (
+      <ItemsDetails itemId={11} getData={getPerson}>
+        <Record filed='gender' label='Gender' />
+        <Record filed='eyeColor' label='Eye Color' />
+        <Record filed='birthYear' label='Birth Year' />
+      </ItemsDetails>
+    );
+
+    const startshipDetails = (
+      <ItemsDetails itemId={5} getData={getShips}>
+        <Record filed='model' label='Model' />
+        <Record filed='length' label='Length' />
+        <Record filed='costInCredits' label='Cost' />
+      </ItemsDetails>
+    );
+
     return (
-      <div className='app'>
-        <Header />
-        {randomPlanet}
+      <ErrorBoundry>
+        <div className='app'>
+          <Header />
+          {/* {randomPlanet} */}
 
-        <div className='row mb2 button-row'>
-          <button
-            className='toggle-planet btn btn-warning btn-lg'
-            onClick={this.toggleRandomPlanet}
-          >
-            Toggle Random Planet
-          </button>
-          <ErrorButton />
+          {/* <div className='row mb2 button-row'>
+            <button
+              className='toggle-planet btn btn-warning btn-lg'
+              onClick={this.toggleRandomPlanet}
+            >
+              Toggle Random Planet
+            </button>
+            <ErrorButton />
+          </div> */}
+
+          {/* PeoplePage - компонент для оборачивания, если компонент выходит из
+        строя, то ломаться будет только он, а не все приложение */}
+          {/* <PeoplePage /> */}
+
+          <Row left={personDetails} right={startshipDetails} />
         </div>
+      </ErrorBoundry>
+    );
+  }
+}
 
-        {/* PeoplePage - для оборачивания, если компонент выходит из
-        строя, то только ломаться будет только он, а не все приложение */}
-        <PeoplePage />
-
-        <div className='row mb2'>
+/* <div className='row mb2'>
           <div className='col-md-6'>
             <ItemList
               onItemSelected={this.onPersonSelected}
@@ -192,8 +252,4 @@ export default class App extends Component {
           <div className='col-md-6'>
             <PersonDetails personId={this.state.getAllPlanets} />
           </div>
-        </div>
-      </div>
-    );
-  }
-}
+        </div> */
