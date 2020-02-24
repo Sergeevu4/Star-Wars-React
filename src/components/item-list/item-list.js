@@ -4,7 +4,8 @@ import ErrorIndicator from '../error-indicator';
 
 import './item-list.css';
 
-// # Обобщенный класс, предназначенный для отрисовки списка: Персонажей, Планет, Кораблей,
+// # Обобщенный класс, предназначенный для отрисовки списка: Персонажей, Планет, Кораблей
+// Generic (обощенный) компонент
 export default class ItemList extends Component {
   // * Первоначальное состояние
   state = {
@@ -14,18 +15,18 @@ export default class ItemList extends Component {
 
   // * Компонент вставлен в DOM
   componentDidMount() {
+    // # Паттерн React: Использование функций
     // Асинхронная (Promise) функция для получения данных
-    // (Список элементов) this.swapiService.getAllPeople
+    // (Список элементов)
+    // this.swapiService.getAllPeople или getAllStarships или getAllPlanets
     const { getData } = this.props;
 
     getData()
       .then((itemList) => {
-        this.setState({
-          itemList,
-        });
+        this.setState({ itemList });
       })
       .catch((err) => {
-        console.error(err);
+        this.setState({ hasError: true });
       });
   }
 
@@ -42,10 +43,17 @@ export default class ItemList extends Component {
 
   // * Функция по созданию React элементов
   renderItems(arr) {
-    // label -> Функция которая будет передана в map,
+    // # Паттерн React: render функция
+    // Функция которая описывает как будет тело этого компонента
+    // const label = this.props.renderItem;
+
+    // Функция которая будет передана в map,
     // для индуал. отрисовки свойств или значений в <li>.
     // Которые получают через сервер
-    const label = this.props.renderItem;
+
+    // # Паттерн React: Передача свойств через Children
+    // Замена метода передачи render функция
+    const label = this.props.children;
 
     return arr.map((item) => {
       const { id } = item;
