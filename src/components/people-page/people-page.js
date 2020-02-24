@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import ItemList from '../item-list';
-import PersonDetails from '../person-details';
-import ErrorIndicator from '../error-indicator';
+import ItemsDetails from '../items-details';
 import SwapiService from '../../services/swapi-service';
 import Row from '../row';
+import ErrorBoundry from '../error-boundry';
 
 import './people-page.css';
 
@@ -25,6 +25,8 @@ import './people-page.css';
 
     Это необходимо для переиспользования компонента,
     ItemList в других компонентах
+    Например отображения разных списков
+    this.swapiService.getAllPeople или getAllStarships или getAllPlanets
 
   # Паттерн React: render функция
     renderItem функция - в компонент передается функция,
@@ -35,18 +37,54 @@ import './people-page.css';
     Например, когда список переиспользуется, то информация внутри li
     может быть отличаться, при помощи функции можно контролировать
     отображения элементов в внутри li
+      renderItem={(item) => `${item.name} (${item.gender})`}
+    ! Может быть с дополнительной разметкой
+      renderItem={(item) => <span>{item.name}<button>!</button></span>}
 
     * Вариант замены render - функции
-      - передавать название свойства объекта, которое нужно отобразить (так можно будет отобразить только одно свойство).
+      - передавать название свойства объекта, которое нужно отобразить
+      (так можно будет отобразить только одно свойство).
 
       - передать в ItemList компонент, который будет использоваться
-      для рендеринга child-компонентов: <ItemList itemComponent={PersonListItem} />
+      для рендеринга child-компонентов:
+      <ItemList itemComponent={PersonListItem} />
 
     ! НО render-функция лучший подход
 
-   # Паттерн React: Передача в свойствах React элементы
+  # Паттерн React: Передача в свойствах React элементы
+    ! React элемент - обычный объект который содержит информацию об этом компоненте
     Так как в React компонент, через свойства можно передавать все что угодно
     то можно передать и React Элементы <Card title={<h1>Hi</h1>}/>
+
+  # Паттерн React: Передача свойств через Children
+    ! React есть два способа передавать свойства компонентам
+      1. Через свойства - props (пары ключ-значение)
+          <ItemList
+            * Есть имя renderItem
+            renderItem={(item) => `${item.name} (${item.gender})`}
+          />
+         Доступ внутри this.props.renderItem
+
+      2. Через children
+           <ItemList>
+            * Нет имени
+            {(item) => `${item.name} (${item.gender})`}
+          </ItemList> <- закрывающий тег
+        Доступ внутри this.props.children
+
+    ! Через children поддерживает передачу
+    ! любых типов данных: строка, элементы, функции, объекты и другие.
+    ! в том числе и дерево элементов React:
+      <ErrorBoundry>
+        <ItemsDetails personId={this.state.selectedPerson} />
+      </ErrorBoundry>
+
+      * Нет разницы то каким способ передавать свойства в компонент
+      * Но читается легче когда компоненты написаны внутри компонента
+      Пример: Через свойства - props
+      <ErrorBoundry
+        body={<ItemsDetails personId={this.state.selectedPerson} />}
+      </>
 */
 
 export default class PeoplePage extends Component {
@@ -54,9 +92,8 @@ export default class PeoplePage extends Component {
   swapiService = new SwapiService();
 
   state = {
-    // Выбранный первоначально id персонажа
-    selectedPerson: 3, // null,
-    hasError: false,
+    // Выбранный первоначально id персонажа или null
+    selectedPerson: 3,
   };
 
   // * Обработчик события по персонажу
@@ -66,30 +103,33 @@ export default class PeoplePage extends Component {
     });
   };
 
-  // * Метод отлова ошибок внутри компонентов
-  componentDidCatch() {
-    this.setState({ hasError: true });
-  }
-
   render() {
-    if (this.state.hasError) {
-      return <ErrorIndicator />;
-    }
-
     // Лучше выносить компонент в переменную, когда он разрастается
     const itemList = (
       <ItemList
         onItemSelected={this.onPersonSelected}
-        // Паттерн React: Использование функция при передачи внутрь компонентов
+        // # Паттерн React: Использование функция при передачи внутрь компонентов
+        // Функция отправляет Promise
         getData={this.swapiService.getAllPeople}
-        // Паттерн React: render функция
-        renderItem={(item) => `${item.name} (${item.gender})`}
-      />
+        // #  Паттерн React: render функция
+        // Функция которая описывает как будет тело этого компонента
+        // renderItem={(item) => `${item.name} (${item.gender})`}
+      >
+        {/* // # Паттерн React: Передача свойств через Children */}
+        {(item) => `${item.name} (${item.gender})`}
+      </ItemList>
     );
 
-    const personDetails = <PersonDetails personId={this.state.selectedPerson} />;
+    const personDetails = (
+      // # Паттерн React: Передача свойств через Children
+      // Декларативно контролировать момент появления ошибки,
+      // оборачивая компоненты данным классом
+      <ErrorBoundry>
+        <ItemsDetails personId={this.state.selectedPerson} />
+      </ErrorBoundry>
+    );
 
-    // Паттерн React: Передача в свойствах React элементы
+    // # Паттерн React: Передача в свойствах React элементы
     return <Row left={itemList} right={personDetails} />;
   }
 }
