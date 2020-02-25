@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import ItemList from '../item-list';
-import ItemsDetails from '../items-details';
-import SwapiService from '../../services/swapi-service';
+import { PersonList, PersonDetails } from '../sw-components';
 import Row from '../row';
 import ErrorBoundry from '../error-boundry';
 
@@ -88,9 +86,6 @@ import './people-page.css';
 */
 
 export default class PeoplePage extends Component {
-  // * Инициализация класс-сервиса, для работы с сервером
-  swapiService = new SwapiService();
-
   state = {
     // Выбранный первоначально id персонажа или null
     selectedPerson: 3,
@@ -106,26 +101,24 @@ export default class PeoplePage extends Component {
   render() {
     // Лучше выносить компонент в переменную, когда он разрастается
     const itemList = (
-      <ItemList
+      <PersonList
         onItemSelected={this.onPersonSelected}
-        // # Паттерн React: Использование функция при передачи внутрь компонентов
-        // Функция отправляет Promise
-        getData={this.swapiService.getAllPeople}
-        // #  Паттерн React: render функция
+        // # Паттерн React: render функция (тот же принцип что у паттерна ниже)
         // Функция которая описывает как будет тело этого компонента
         // renderItem={(item) => `${item.name} (${item.gender})`}
       >
         {/* // # Паттерн React: Передача свойств через Children */}
         {(item) => `${item.name} (${item.gender})`}
-      </ItemList>
+      </PersonList>
     );
 
+    // # Паттерн React: Передача свойств через Children (ErrorBoundry)
+    // Декларативно контролировать момент появления ошибки,
+    // оборачивая компоненты данным классом
+
     const personDetails = (
-      // # Паттерн React: Передача свойств через Children
-      // Декларативно контролировать момент появления ошибки,
-      // оборачивая компоненты данным классом
       <ErrorBoundry>
-        <ItemsDetails personId={this.state.selectedPerson} />
+        <PersonDetails itemId={this.state.selectedPerson} />
       </ErrorBoundry>
     );
 
