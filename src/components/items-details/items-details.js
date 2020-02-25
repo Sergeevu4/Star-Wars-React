@@ -41,33 +41,29 @@ export { Record };
 // # Обобщенный класс, предназначенный для отрисовки деталей: Персонажей, Планет, Кораблей
 // Generic (обощенный) компонент
 export default class ItemsDetails extends Component {
-  // * Реализация Spinner через публичное поле класса
-  _loading = false;
-
   state = {
     item: null, // Сам элемен, персонаж, корабль, планета
     image: null,
+    loading: true,
   };
 
   // Компонент может быть сразу инициализировать с каким-то id
-  // В App selectedPerson: 5 -> какой id - поэтому его стоит сразу обновить
+  // В people-page selectedPerson: 5 -> какой id - поэтому его стоит сразу обновить
   componentDidMount() {
-    this.updatePerson();
+    this.updateItem();
   }
 
-  // * Если через props получен новый id, компонент должен обновиться
+  // Если через props получен новый id, компонент должен обновиться
   componentDidUpdate(prevProps) {
-    this._loading = true;
-
     // ! Важно делать проверку
     if (prevProps.itemId !== this.props.itemId) {
-      this.updatePerson();
-      this._loading = false;
+      this.setState({ loading: true });
+      this.updateItem();
     }
   }
 
   // * Функция по обновлению персонажей
-  updatePerson() {
+  updateItem() {
     // # Паттерн React: Использование функция (SwapiService)
     // getData Асинхронная (Promise) функция для получения данных
     const { itemId, getData } = this.props;
@@ -79,25 +75,25 @@ export default class ItemsDetails extends Component {
 
     getData(itemId)
       .then((item) => {
-        this.setState({ item });
+        this.setState({ item, loading: false });
       })
       .catch((err) => console.error(err));
   }
 
   render() {
-    const { item } = this.state;
+    const { item, loading } = this.state;
 
     // Если item не назначен еще персонаж, тогда выводить сообщение
     if (!item) {
       return <span>Select a person from a list</span>;
     }
 
-    const { name, gender, birthYear, eyeColor, image } = item;
-
     // Если загружается
-    if (this._loading) {
+    if (loading) {
       return <Spinner />;
     }
+
+    const { name, image } = item;
 
     return (
       <div className='item-details card'>
