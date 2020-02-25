@@ -85,6 +85,7 @@ import './people-page.css';
       </>
 */
 
+// # Компонент обертка, объединяющая в себе весь функционал для показа
 export default class PeoplePage extends Component {
   state = {
     // Выбранный первоначально id персонажа или null
@@ -100,17 +101,8 @@ export default class PeoplePage extends Component {
 
   render() {
     // Лучше выносить компонент в переменную, когда он разрастается
-    const itemList = (
-      <PersonList
-        onItemSelected={this.onPersonSelected}
-        // # Паттерн React: render функция (тот же принцип что у паттерна ниже)
-        // Функция которая описывает как будет тело этого компонента
-        // renderItem={(item) => `${item.name} (${item.gender})`}
-      >
-        {/* // # Паттерн React: Передача свойств через Children */}
-        {(item) => `${item.name} (${item.gender})`}
-      </PersonList>
-    );
+    // * Вся внутрення реализация скрыта внутри item-list.js
+    const itemList = <PersonList onItemSelected={this.onPersonSelected} />;
 
     // # Паттерн React: Передача свойств через Children (ErrorBoundry)
     // Декларативно контролировать момент появления ошибки,
@@ -126,3 +118,19 @@ export default class PeoplePage extends Component {
     return <Row left={itemList} right={personDetails} />;
   }
 }
+
+/*
+  # Использование Render функции или Передача свойств через Children
+  # Без использования композиции функций HOC
+  <PersonList
+    onItemSelected={this.onPersonSelected}
+    // # Паттерн React: render функция (тот же принцип что у паттерна ниже)
+    Функция которая описывает как будет тело этого компонента
+    renderItem={(item) => `${item.name} (${item.gender})`}
+    >
+
+    // # Паттерн React: Передача свойств через Children
+    Функция которая описывает как будет тело этого компонента
+    {(item) => `${item.name} (${item.gender})`}
+  </PersonList>
+*/
