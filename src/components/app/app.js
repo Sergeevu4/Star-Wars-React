@@ -143,65 +143,19 @@ export default class App extends Component {
   render() {
     // ! null игнорируется jsx
     // Показывать или скрывать случайную планету
-    // const randomPlanet = this.state.showRandomPlanet ? <RandomPlanet /> : null;
+    const randomPlanet = this.state.showRandomPlanet ? <RandomPlanet /> : null;
 
     if (this.state.hasError) {
       return <ErrorIndicator />;
     }
 
-    // Функции получения персонажа и корабля
-    const { getPerson, getShips } = this.swapiService;
-
-    /*
-      # Паттерн React: Работа с props.children + клонирования свойств
-      Что должно отображаться внутри ItemsDetails
-      Так как он стал (обощенный) компонентом
-
-      Record -> li принимает значение для отображения определенных характеристик того, что мы хотим отрендарить,
-      она разная в зависимости от загружаемых данных:
-      корабль, персонаж или планета
-
-      Для того чтобы извлечь эти данные, нам нужен объект item
-      который получаем внутри items-details через React.Children.map + React.cloneElement - (так как React элементы имутабельны)
-      filed - это ключ для информации item[filed], label название колонки
-
-      * Record - можно было заменить:
-        <ItemsDetails
-          ...
-          fields = {
-            [
-              { filed='gender' label='Gender' },
-              { filed='eyeColor' label='Eye Color' }
-            ]
-          }
-        />
-      * Но подобное решение не в духе React, ведь он построен на идеи
-      * компонентов которые описывают внешний вид приложения
-    */
-
-    const personDetails = (
-      <ItemsDetails itemId={11} getData={getPerson}>
-        <Record filed='gender' label='Gender' />
-        <Record filed='eyeColor' label='Eye Color' />
-        <Record filed='birthYear' label='Birth Year' />
-      </ItemsDetails>
-    );
-
-    const startshipDetails = (
-      <ItemsDetails itemId={5} getData={getShips}>
-        <Record filed='model' label='Model' />
-        <Record filed='length' label='Length' />
-        <Record filed='costInCredits' label='Cost' />
-      </ItemsDetails>
-    );
-
     return (
       <ErrorBoundry>
         <div className='app'>
           <Header />
-          {/* {randomPlanet} */}
+          {randomPlanet}
 
-          {/* <div className='row mb2 button-row'>
+          <div className='row mb2 button-row'>
             <button
               className='toggle-planet btn btn-warning btn-lg'
               onClick={this.toggleRandomPlanet}
@@ -209,47 +163,13 @@ export default class App extends Component {
               Toggle Random Planet
             </button>
             <ErrorButton />
-          </div> */}
+          </div>
 
           {/* PeoplePage - компонент для оборачивания, если компонент выходит из
         строя, то ломаться будет только он, а не все приложение */}
-          {/* <PeoplePage /> */}
-
-          <Row left={personDetails} right={startshipDetails} />
+          <PeoplePage />
         </div>
       </ErrorBoundry>
     );
   }
 }
-
-/* <div className='row mb2'>
-          <div className='col-md-6'>
-            <ItemList
-              onItemSelected={this.onPersonSelected}
-              getData={this.swapiService.getAllPlanets}
-              renderItem={(item) => (
-                <span>
-                  {item.name} <b>{`diameter: ${item.diameter}`}</b>
-                </span>
-              )}
-            />
-          </div>
-
-          <div className='col-md-6'>
-            <PersonDetails personId={this.state.selectedPerson} />
-          </div>
-        </div>
-
-        <div className='row mb2'>
-          <div className='col-md-6'>
-            <ItemList
-              onItemSelected={this.onPersonSelected}
-              getData={this.swapiService.getAllStarships}
-              renderItem={({ name }) => name}
-            />
-          </div>
-
-          <div className='col-md-6'>
-            <PersonDetails personId={this.state.getAllPlanets} />
-          </div>
-        </div> */
