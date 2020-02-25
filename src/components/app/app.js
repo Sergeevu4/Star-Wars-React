@@ -8,11 +8,11 @@ import SwapiService from '../../services/swapi-service';
 import ErrorBoundry from '../error-boundry';
 
 import './app.css';
-import Row from '../row';
-import ItemsDetails, { Record } from '../items-details/';
 
-// import ItemList from '../item-list';
-// import PersonDetails from '../person-details';
+// ! Использования React Context
+// Дает вложенным компонентам доступ к значению которое мы передает
+// -> PeoplePage -> PersonDetails
+import { SwapiServiceProvider } from '../swapi-service-contex';
 
 /*
   1. Создать компонента заглушки (верста и стилизация)
@@ -151,24 +151,24 @@ export default class App extends Component {
 
     return (
       <ErrorBoundry>
-        <div className='app'>
-          <Header />
-          {randomPlanet}
+        <SwapiServiceProvider value={this.swapiService}>
+          <div className='app'>
+            <Header />
+            {randomPlanet}
 
-          <div className='row mb2 button-row'>
-            <button
-              className='toggle-planet btn btn-warning btn-lg'
-              onClick={this.toggleRandomPlanet}
-            >
-              Toggle Random Planet
-            </button>
-            <ErrorButton />
+            <div className='row mb2 button-row'>
+              <button
+                className='toggle-planet btn btn-warning btn-lg'
+                onClick={this.toggleRandomPlanet}
+              >
+                Toggle Random Planet
+              </button>
+              <ErrorButton />
+            </div>
+
+            <PeoplePage />
           </div>
-
-          {/* PeoplePage - компонент для оборачивания, если компонент выходит из
-        строя, то ломаться будет только он, а не все приложение */}
-          <PeoplePage />
-        </div>
+        </SwapiServiceProvider>
       </ErrorBoundry>
     );
   }
