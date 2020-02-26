@@ -1,9 +1,8 @@
 import React from 'react';
 import ItemsDetails, { Record } from '../items-details/';
-// import SwapiService from '../../services/swapi-service';
 
-// ! Использования React Context (Замена вызова SwapiService)
-import { SwapiServiceConsumer } from '../swapi-service-contex';
+// ! Использования React Context (Замена вызова SwapiService) через HOC
+import { withSwapiService } from '../hoc-helpers';
 
 /*
   ! Код будет более читабельным, если вынести детали конфигурации в отдельные компоненты
@@ -46,7 +45,7 @@ import { SwapiServiceConsumer } from '../swapi-service-contex';
     );
 
     const startshipDetails = (
-      <ItemsDetails itemId={5} getData={getShips}>
+      <ItemsDetails itemId={5} getData={getStarship}>
         <Record filed='model' label='Model' />
         <Record filed='length' label='Length' />
         <Record filed='costInCredits' label='Cost' />
@@ -56,55 +55,18 @@ import { SwapiServiceConsumer } from '../swapi-service-contex';
 
 // # Паттерн React: Использование функция при передачи внутрь компонентов
 // Функции получения данных: персонажей, планет, кораблей
-// const { getPerson, getPlanet, getShips } = new SwapiService();
+// const { getPerson, getPlanet, getStarship } = new SwapiService();
 
-const PersonDetails = ({ itemId }) => {
+const PersonDetails = ({ itemId, swapiService }) => {
+  const { getPerson } = swapiService;
+
   return (
-    // Получает swapiService ({getPerson}) из SwapiServiceProvider -> app
-    <SwapiServiceConsumer>
-      {({ getPerson }) => {
-        return (
-          <ItemsDetails itemId={itemId} getData={getPerson}>
-            <Record filed='gender' label='Gender' />
-            <Record filed='eyeColor' label='Eye Color' />
-            <Record filed='birthYear' label='Birth Year' />
-          </ItemsDetails>
-        );
-      }}
-    </SwapiServiceConsumer>
+    <ItemsDetails itemId={itemId} getData={getPerson}>
+      <Record filed='gender' label='Gender' />
+      <Record filed='eyeColor' label='Eye Color' />
+      <Record filed='birthYear' label='Birth Year' />
+    </ItemsDetails>
   );
 };
 
-const PlanetDetails = ({ itemId }) => {
-  return (
-    <SwapiServiceConsumer>
-      {({ getPlanet }) => {
-        return (
-          <ItemsDetails itemId={itemId} getData={getPlanet}>
-            <Record filed='population' label='Population' />
-            <Record filed='rotationPeriod' label='Rotation Period' />
-            <Record filed='diameter' label='Diameter' />
-          </ItemsDetails>
-        );
-      }}
-    </SwapiServiceConsumer>
-  );
-};
-
-const StarshipDetails = ({ itemId }) => {
-  return (
-    <SwapiServiceConsumer>
-      {({ getPlanet }) => {
-        return (
-          <ItemsDetails itemId={itemId} getData={getPlanet}>
-            <Record filed='model' label='Model' />
-            <Record filed='length' label='Length' />
-            <Record filed='costInCredits' label='Cost' />
-          </ItemsDetails>
-        );
-      }}
-    </SwapiServiceConsumer>
-  );
-};
-
-export { PersonDetails, PlanetDetails, StarshipDetails };
+export default withSwapiService(PersonDetails);
