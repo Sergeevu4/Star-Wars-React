@@ -137,7 +137,7 @@ export default class SwapiService {
   };
 
   // * Конкретный корабль
-  getShips = async (id) => {
+  getStarship = async (id) => {
     const ship = await this.getResource(`/starships/${id}/`);
     return this._transformStarships(ship);
   };
