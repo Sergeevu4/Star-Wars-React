@@ -3,8 +3,6 @@ import { PersonList, PersonDetails } from '../sw-components';
 import Row from '../row';
 import ErrorBoundry from '../error-boundry';
 
-import './people-page.css';
-
 /*
   # Паттерн React: Использование функция при передачи внутрь компонентов
     ! Функции, которые передаем компоненту могут быть не только обработчиками событий
@@ -74,14 +72,14 @@ import './people-page.css';
     ! любых типов данных: строка, элементы, функции, объекты и другие.
     ! в том числе и дерево элементов React:
       <ErrorBoundry>
-        <ItemsDetails personId={this.state.selectedPerson} />
+        <ItemsDetails personId={this.state.selectedItem} />
       </ErrorBoundry>
 
       * Нет разницы то каким способ передавать свойства в компонент
       * Но читается легче когда компоненты написаны внутри компонента
       Пример: Через свойства - props
       <ErrorBoundry
-        body={<ItemsDetails personId={this.state.selectedPerson} />}
+        body={<ItemsDetails personId={this.state.selectedItem} />}
       </>
 */
 
@@ -89,13 +87,13 @@ import './people-page.css';
 export default class PeoplePage extends Component {
   state = {
     // Выбранный первоначально id персонажа или null
-    selectedPerson: 3,
+    selectedItem: 3,
   };
 
   // * Обработчик события по персонажу
   onPersonSelected = (id) => {
     this.setState({
-      selectedPerson: id,
+      selectedItem: id,
     });
   };
 
@@ -108,14 +106,14 @@ export default class PeoplePage extends Component {
     // Декларативно контролировать момент появления ошибки,
     // оборачивая компоненты данным классом
 
-    const personDetails = (
+    const details = (
       <ErrorBoundry>
-        <PersonDetails itemId={this.state.selectedPerson} />
+        <PersonDetails itemId={this.state.selectedItem} />
       </ErrorBoundry>
     );
 
     // # Паттерн React: Передача в свойствах React элементы
-    return <Row left={itemList} right={personDetails} />;
+    return <Row left={itemList} right={details} />;
   }
 }
 
