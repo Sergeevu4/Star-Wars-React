@@ -53,15 +53,16 @@ import { withSwapiService } from '../hoc-helpers';
   );
 */
 
+// ! Заменен на Паттерн React: Трансформация props
 // # Паттерн React: Использование функция при передачи внутрь компонентов
 // Функции получения данных: персонажей, планет, кораблей
 // const { getPerson, getPlanet, getStarship } = new SwapiService();
 
-const PersonDetails = ({ itemId, swapiService }) => {
-  const { getPerson } = swapiService;
-
+const PersonDetails = (props) => {
+  // Ключи и свойства совпадают, можно заменить на {...props}
+  // itemId={itemId} getData={getData}
   return (
-    <ItemsDetails itemId={itemId} getData={getPerson}>
+    <ItemsDetails {...props}>
       <Record filed='gender' label='Gender' />
       <Record filed='eyeColor' label='Eye Color' />
       <Record filed='birthYear' label='Birth Year' />
@@ -69,4 +70,29 @@ const PersonDetails = ({ itemId, swapiService }) => {
   );
 };
 
-export default withSwapiService(PersonDetails);
+// # Паттерн React: Трансформация props в компонентах высшего порядка
+// Можно не передавать компоненту PersonDetails весь SwapiService,
+// а передать только необходимые ему функции
+const mapMethodsToProps = (swapiService) => {
+  return {
+    getData: swapiService.getPerson,
+  };
+};
+
+// # Паттерн React: Использование HOC для работы с контекстом (withSwapiService)
+export default withSwapiService(PersonDetails, mapMethodsToProps);
+
+/*
+  # БЕЗ Трансформации props в компонентах высшего порядка
+  const PersonDetails = ({ itemId, swapiService }) => {
+    const { getPerson } = swapiService;
+
+    return (
+      <ItemsDetails itemId={itemId} getData={getData}>
+        <Record filed='gender' label='Gender' />
+        <Record filed='eyeColor' label='Eye Color' />
+        <Record filed='birthYear' label='Birth Year' />
+      </ItemsDetails>
+    );
+  }
+*/

@@ -8,11 +8,9 @@ import { withSwapiService } from '../hoc-helpers';
 // Функции получения данных: персонажей, планет, кораблей
 // const { getPerson, getPlanet, getStarship } = new SwapiService();
 
-const StarshipDetails = ({ itemId, swapiService }) => {
-  const { getStarship } = swapiService;
-
+const StarshipDetails = (props) => {
   return (
-    <ItemsDetails itemId={itemId} getData={getStarship}>
+    <ItemsDetails {...props}>
       <Record filed='model' label='Model' />
       <Record filed='length' label='Length' />
       <Record filed='costInCredits' label='Cost' />
@@ -20,5 +18,14 @@ const StarshipDetails = ({ itemId, swapiService }) => {
   );
 };
 
-// export { PersonDetails, PlanetDetails, StarshipDetails };
-export default withSwapiService(StarshipDetails);
+// # Паттерн React: Трансформация props в компонентах высшего порядка
+// Можно не передавать компоненту PersonDetails весь SwapiService,
+// а передать только необходимые ему функции
+const mapMethodsToProps = (swapiService) => {
+  return {
+    getData: swapiService.getStarship,
+  };
+};
+
+// # Паттерн React: Использование HOC для работы с контекстом (withSwapiService)
+export default withSwapiService(StarshipDetails, mapMethodsToProps);
