@@ -78,22 +78,28 @@ const mapStarshipMethodsToProps = (swapiService) => {
 };
 
 // # Паттерн React: Композиция компонентов высшего порядка
+const compose = (...funcs) => (comp) =>
+  funcs.reduceRight((prevResult, fn) => fn(prevResult), comp);
+
 // Компонент: Список всех кораблей
-const PersonList = withSwapiService(
-  withData(withChildFunction(ItemList, renderPerson)),
-  mapPersonMethodsToProps
-);
+const PersonList = compose(
+  withSwapiService(mapPersonMethodsToProps),
+  withData,
+  withChildFunction(renderPerson)
+)(ItemList);
 
 // Компонент: Список всех планет
-const PlanetList = withSwapiService(
-  withData(withChildFunction(ItemList, renderPlanet)),
-  mapPlanetMethodsToProps
-);
+const PlanetList = compose(
+  withSwapiService(mapPlanetMethodsToProps),
+  withData,
+  withChildFunction(renderPlanet)
+)(ItemList);
 
 // Компонент: Список всех кораблей
-const StarshipList = withSwapiService(
-  withData(withChildFunction(ItemList, renderStarship)),
-  mapStarshipMethodsToProps
-);
+const StarshipList = compose(
+  withSwapiService(mapStarshipMethodsToProps),
+  withData,
+  withChildFunction(renderStarship)
+)(ItemList);
 
 export { PersonList, PlanetList, StarshipList };
