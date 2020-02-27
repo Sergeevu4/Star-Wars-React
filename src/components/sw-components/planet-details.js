@@ -28,4 +28,4 @@ const mapMethodsToProps = (swapiService) => {
 };
 
 // # Паттерн React: Использование HOC для работы с контекстом (withSwapiService)
-export default withSwapiService(PlanetDetails, mapMethodsToProps);
+export default withSwapiService(mapMethodsToProps)(PlanetDetails);

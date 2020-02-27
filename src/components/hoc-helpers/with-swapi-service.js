@@ -38,9 +38,12 @@ import { SwapiServiceConsumer } from '../swapi-service-contex';
     тем самым SwapiService можно легко заменить из App на любой другой источник
     например на моковые данные
 
+  # Паттерн React: Частичное примененные функции (mapMethodsToProps) => (Wrapped)
+  Такие функции принимают часть аргументов и возвращают новые функции
+  с меньшим количеством аргументов
 */
 
-const withSwapiService = (Wrapped, mapMethodsToProps) =>
+const withSwapiService = (mapMethodsToProps) => (Wrapped) =>
   function WithSwapiService(props) {
     return (
       <SwapiServiceConsumer>
