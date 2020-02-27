@@ -1,6 +1,6 @@
 import React from 'react';
 import ItemList from '../item-list';
-import { withData, withSwapiService } from '../hoc-helpers';
+import { withData, withSwapiService, withChildFunction, compose } from '../hoc-helpers';
 
 // ! Данный компоненты - более высокая абстракция над компонентами
 
@@ -42,15 +42,6 @@ import { withData, withSwapiService } from '../hoc-helpers';
 // Функции получения данных: персонажей, планет, кораблей
 // const { getAllPeople, getAllPlanets, getAllStarships } = new SwapiService();
 
-// # Компонент высшего порядка
-// # Паттерн React: Частичное примененные функции
-// * Функция возвращает компонент ItemList c функцией Children внутри
-const withChildFunction = (fn) => (Wrapped) =>
-  function WithChildFunction(props) {
-    // props принимает от withData -> itemList
-    return <Wrapped {...props}>{fn}</Wrapped>;
-  };
-
 // # Паттерн React: Передача свойств через Children и Render функция
 // * Функции которые описывает как будет тело списков компонентов:
 const renderPerson = (item) => `${item.name} (${item.gender})`;
@@ -78,9 +69,6 @@ const mapStarshipMethodsToProps = (swapiService) => {
 };
 
 // # Паттерн React: Композиция компонентов высшего порядка
-const compose = (...funcs) => (comp) =>
-  funcs.reduceRight((prevResult, fn) => fn(prevResult), comp);
-
 // Компонент: Список всех кораблей
 const PersonList = compose(
   withSwapiService(mapPersonMethodsToProps),
