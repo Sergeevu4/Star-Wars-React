@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './item-list.css';
 
 // Generic (обощенный) компонент
@@ -41,6 +42,25 @@ const ItemList = (props) => {
 
   const items = renderItems(data);
   return <ul className='item-list list-group'>{items}</ul>;
+};
+
+// Если внутри  <PersonList onItemSelected={this.onPersonSelected} />;
+// Не передать функцию, то произойдет ошибка, можно предотвратить этого:
+// ! Если будет отправлен props cо значением null - defaultProps, работать не будет
+// # Свойства по умолчанию
+ItemList.defaultProps = {
+  onItemSelected: () => {
+    console.log('ItemList.defaultProps');
+  },
+};
+
+// # Валидация типов входящих props
+ItemList.propsTypes = {
+  // isRequired - необязательно так как определенно в defaultProps
+  onItemSelected: PropTypes.func,
+  // Массив объектов
+  data: PropTypes.arrayOf(PropTypes.object).isRequired,
+  children: PropTypes.func.isRequired,
 };
 
 export default ItemList;

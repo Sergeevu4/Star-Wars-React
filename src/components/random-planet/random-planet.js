@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import SwapiService from '../../services/swapi-service';
 import Spinner from '../spinner/spinner';
 import ErrorIndicator from '../error-indicator';
+import PropTypes from 'prop-types';
 
 import './random-planet.css';
 
@@ -15,9 +16,25 @@ import './random-planet.css';
   что происходит (получает данные, управляет состоянием, знает загружается ли сейчас компонент)
 
   Остальные компоненты PlanetView, занимаются исключительно за отображением данных,при этом они ничего не знаю откуда эти данные берутся
+
+  ! Если будет отправлен props cо значением null - defaultProps, работать не будет
+
+  ! Если  propTypes определены свойства, isRequired в PropTypes писать не нужно,
+  ! так как propTypes срабатывает после defaultProps, значение присваивается из defaultProps
 */
 
 export default class RandomPlanet extends Component {
+  // * Свойства по умолчанию
+  static defaultProps = {
+    updateInterval: 10000,
+  };
+
+  // * Валидация типов входящих props
+  static propTypes = {
+    // Проверка типа и делает его обязательным
+    updateInterval: PropTypes.number,
+  };
+
   // * Инициализация класс-сервиса, для работы с сервером
   swapiService = new SwapiService();
 
@@ -30,9 +47,12 @@ export default class RandomPlanet extends Component {
 
   // * Компонент вставлен в DOM
   componentDidMount() {
+    // Таймер, можно передавать через App
+    const { updateInterval } = this.props;
+
     this.updatePlanet();
     // Обновляем показ рандомной планеты
-    this.interval = setInterval(this.updatePlanet, 10000);
+    this.interval = setInterval(this.updatePlanet, updateInterval);
   }
 
   // * Компонент удален
@@ -123,12 +143,7 @@ const PlanetView = ({ planet }) => {
     // * Для группировки элементов
     // Можно заменить массив: return [jsx - теги ]
     <React.Fragment>
-      <img
-        className='planet-image'
-        src={isImage}
-        // src={`https://starwars-visualguide.com/assets/img/planets/${id}.jpg`}
-        alt={name}
-      />
+      <img className='planet-image' src={isImage} alt={name} />
       <div>
         <h4>{name}</h4>
         <ul className='list-group list-group-flush'>

@@ -1,5 +1,6 @@
 import React from 'react';
 import './row.css';
+import PropTypes from 'prop-types';
 
 /*
   # Паттерн React: Передача в свойствах React элементы
@@ -27,6 +28,14 @@ const Row = ({ left, right }) => {
       <div className='col-md-6'>{right}</div>
     </div>
   );
+};
+
+// # Валидация типов входящих props
+Row.propsTypes = {
+  // PropTypes.element - только React-элемент
+  // PropTypes.node - все что может отрендарить React
+  left: PropTypes.node,
+  right: PropTypes.node,
 };
 
 export default Row;
