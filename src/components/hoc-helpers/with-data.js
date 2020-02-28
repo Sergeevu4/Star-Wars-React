@@ -25,7 +25,7 @@ import ErrorIndicator from '../error-indicator';
   * 1) Первоначальное состояние
     state = {
       itemList: null,
-      hasError: false,
+      error: false,
     };
 
   * 2) Загрузка данных
@@ -39,25 +39,25 @@ import ErrorIndicator from '../error-indicator';
           this.setState({ itemList });
         })
         .catch((err) => {
-          this.setState({ hasError: true });
+          this.setState({ error: true });
         });
     }
 
   * 3) Обработка ошибки
     componentDidCatch() {
-      this.setState({ hasError: true });
+      this.setState({ error: true });
     }
 
   * 4) В render проверяем есть ли ошибка, загрузка
     render() {
-        const { itemList, hasError } = this.state;
+        const { itemList, error } = this.state;
 
         // Если данные еще не получены отображается spinner
         if (!itemList) {
           return <Spinner />;
         }
 
-        if (hasError) {
+        if (error) {
           return <ErrorIndicator />;
         }
     }
@@ -75,7 +75,7 @@ const withData = (View) => {
     // * Первоначальное состояние
     state = {
       data: null,
-      hasError: false,
+      error: false,
     };
 
     // * Компонент вставлен в DOM
@@ -92,23 +92,23 @@ const withData = (View) => {
           this.setState({ data });
         })
         .catch((err) => {
-          this.setState({ hasError: true });
+          this.setState({ error: true });
         });
     }
 
     componentDidCatch() {
-      this.setState({ hasError: true });
+      this.setState({ error: true });
     }
 
     render() {
-      const { data, hasError } = this.state;
+      const { data, error } = this.state;
 
       // Если данные еще не получены отображается spinner
       if (!data) {
         return <Spinner />;
       }
 
-      if (hasError) {
+      if (error) {
         return <ErrorIndicator />;
       }
 
