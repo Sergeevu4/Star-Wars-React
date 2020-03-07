@@ -26,7 +26,7 @@ import './random-planet.css';
 export default class RandomPlanet extends Component {
   // * Свойства по умолчанию
   static defaultProps = {
-    updateInterval: 10000,
+    updateInterval: 100000,
   };
 
   // * Валидация типов входящих props
@@ -37,6 +37,9 @@ export default class RandomPlanet extends Component {
 
   // * Инициализация класс-сервиса, для работы с сервером
   swapiService = new SwapiService();
+
+  // * Собственный способ отмены Fetch
+  _cancelled = false;
 
   // * Первоначальное состояние
   state = {
@@ -60,6 +63,7 @@ export default class RandomPlanet extends Component {
     // Очиста таймера в момент сокрытия через App -> toggleRandomPlanet
     // Если этого не сделать, то даже после удаления, будет происходить утечка памяти
     clearInterval(this.interval);
+    this._cancelled = true;
   }
 
   // * Then после асинхронной загрузки, преобразования данных и запись в state
@@ -69,15 +73,16 @@ export default class RandomPlanet extends Component {
   onPlanetLoaded = (planet) => {
     // Нет зависимости от предыдущего state, можно использовать объект
     // Когда произошла загрузка данных отключает Spinner
-    this.setState({ planet, loading: false });
+    !this._cancelled && this.setState({ planet, loading: false });
   };
 
   // * Catch - для обработки ошибок в момент загрузки данных
   onError = (err) => {
-    this.setState({
-      error: true,
-      loading: false,
-    });
+    !this._cancelled &&
+      this.setState({
+        error: true,
+        loading: false,
+      });
   };
 
   // * Загрузка случайной Планеты
