@@ -24,7 +24,7 @@ import './items-details.css';
 */
 
 // * item -> это тот объект который мы получаем из getData который записывается в state
-// filed, label получаем через app
+// filed, label получаем через PlanetDetails
 const Record = ({ item, filed, label }) => {
   return (
     <li className='list-group-item'>
@@ -42,9 +42,8 @@ export { Record };
 // Generic (обощенный) компонент
 export default class ItemsDetails extends Component {
   state = {
-    item: null, // Сам элемен, персонаж, корабль, планета
-    image: null,
-    loading: true,
+    item: null, // персонаж, корабль, планета
+    loading: false,
   };
 
   // Компонент может быть сразу инициализировать с каким-то id
@@ -53,13 +52,21 @@ export default class ItemsDetails extends Component {
     this.updateItem();
   }
 
-  // Если через props получен новый id, компонент должен обновиться
+  // * Если через props получен новый id, компонент должен обновиться
+  // * Проверка функции getData из-за возможности смены сервиса данных
   componentDidUpdate(prevProps) {
     // ! Важно делать проверку
-    if (prevProps.itemId !== this.props.itemId) {
-      this.setState({ loading: true });
+    if (
+      this.props.itemId !== prevProps.itemId ||
+      this.props.getData !== prevProps.getData
+    ) {
       this.updateItem();
     }
+  }
+
+  componentWillUnmount() {
+    // ! Отмена Fetch
+    this.props.cancelResource();
   }
 
   // * Функция по обновлению персонажей
@@ -68,29 +75,43 @@ export default class ItemsDetails extends Component {
     // getData Асинхронная (Promise) функция для получения данных
     const { itemId, getData } = this.props;
 
-    // Если у нас нет id, ничего обновлять не нужно, первоначально он null
+    // Если в момент componentDidMount
+    // у нас нет id, ничего обновлять не нужно, первоначально он null
     if (!itemId) {
       return;
     }
+
+    // После обновления, state остается старый, пока его обновить вручную
+    this.setState({
+      item: null,
+      loading: true,
+    });
 
     getData(itemId)
       .then((item) => {
         this.setState({ item, loading: false });
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        // ! Проверяю тип ошибки, при отмене Fetch выхожу
+        if (err.name === 'AbortError') {
+          console.error('Fetch Aborted');
+          return;
+        }
+        this.setState({ loading: false });
+      });
   }
 
   render() {
     const { item, loading } = this.state;
 
-    // Если item не назначен еще персонаж, тогда выводить сообщение
-    if (!item) {
-      return <span>Select a person from a list</span>;
-    }
-
     // Если загружается
     if (loading) {
       return <Spinner />;
+    }
+
+    // Если item не назначен еще персонаж, тогда выводить сообщение
+    if (!item) {
+      return <span>Select a person from a list</span>;
     }
 
     const { name, image } = item;
