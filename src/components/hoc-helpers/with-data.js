@@ -75,36 +75,66 @@ const withData = (View) => {
     // * Первоначальное состояние
     state = {
       data: null,
+      loading: true,
       error: false,
     };
 
     // * Компонент вставлен в DOM
     componentDidMount() {
+      this.update();
+    }
+
+    // * Проверка функции getData из-за возможности смены сервиса данных (App)
+    componentDidUpdate(prevProps) {
+      if (this.props.getData !== prevProps.getData) {
+        this.update();
+      }
+    }
+
+    componentWillUnmount() {
+      // ! Отмена Fetch
+      this.props.cancelResource();
+    }
+
+    update() {
+      // * После того как загрузился data loading остается false, нужно обновить state
+      // При смене сервиса, должен будет появляться спиннер
+      this.setState({
+        loading: true,
+        error: false,
+      });
+
       // # Паттерн React: Использование функций (getData)
       // Асинхронная (Promise) функция для получения данных
       // (Список элементов)
       // this.swapiService.getAllPeople или getAllStarships или getAllPlanets
-
-      // ! Получаем через withSwapiService ()
+      // ! this.props получаем через withSwapiService ()
       this.props
         .getData()
         .then((data) => {
-          this.setState({ data });
+          this.setState({
+            data,
+            loading: false,
+          });
         })
         .catch((err) => {
-          this.setState({ error: true });
+          // ! Проверяю тип ошибки, при отмене Fetch выхожу
+          if (err.name === 'AbortError') {
+            console.error('Fetch Aborted');
+            return;
+          }
+          this.setState({
+            error: true,
+            loading: false,
+          });
         });
     }
 
-    componentDidCatch() {
-      this.setState({ error: true });
-    }
-
     render() {
-      const { data, error } = this.state;
+      const { data, loading, error } = this.state;
 
       // Если данные еще не получены отображается spinner
-      if (!data) {
+      if (loading) {
         return <Spinner />;
       }
 
