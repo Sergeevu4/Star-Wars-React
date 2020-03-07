@@ -50,7 +50,9 @@ const withSwapiService = (mapMethodsToProps) => (Wrapped) =>
         {(swapiService) => {
           // Трансформация props
           const serviceProps = mapMethodsToProps(swapiService);
-          return <Wrapped {...props} {...serviceProps} />;
+          // Отмена Fetch
+          const { cancelResource } = swapiService;
+          return <Wrapped {...props} {...serviceProps} cancelResource={cancelResource} />;
         }}
       </SwapiServiceConsumer>
     );

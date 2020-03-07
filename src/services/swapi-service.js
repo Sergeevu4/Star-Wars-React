@@ -28,8 +28,14 @@ export default class SwapiService {
 
   // * Метод для работы с fetch
   async getResource(url) {
+    // Метод для отмены Fetch, устанавливаю в публичное поле класса,
+    // При каждом вызове метода getResource - эта поле будет перезаписывается новым AbortController
+    this._controller = new AbortController();
+
     // Жду результата
-    const response = await fetch(`${this._apiBase}${url}`);
+    const response = await fetch(`${this._apiBase}${url}`, {
+      signal: this._controller.signal,
+    });
     // Если результат ответа от сервера приходит не -> 200
     if (!response.ok) {
       throw new Error(`Could not fetch ${url}, received ${response.status}`);
@@ -38,6 +44,11 @@ export default class SwapiService {
 
     return body;
   }
+
+  // * Отмена Fetch
+  cancelResource = () => {
+    this._controller.abort();
+  };
 
   // * Функция по созданию id из полученного url Api
   // Так как у Api (swapi) в присланном нам объекте нету поля id
@@ -141,23 +152,6 @@ export default class SwapiService {
     const ship = await this.getResource(`/starships/${id}/`);
     return this._transformStarships(ship);
   };
-
-  // ! Функции получения изображения можно заменить
-  // ! На получения их сразу при вызове функций трансформации данных от Api
-  // * Получения Картинки по id Персонажа
-  // getPersonImage = (id) => {
-  //   return `${this._imageBase}/characters/${id}.jpg`;
-  // };
-
-  // // * Получения Картинки по id Корабля
-  // getStarshipImage = (id) => {
-  //   return `${this._imageBase}/starships/${id}.jpg`;
-  // };
-
-  // // * Получения Картинки по id Планеты
-  // getPlanetImage = (id) => {
-  //   return `${this._imageBase}/planets/${id}.jpg`;
-  // };
 }
 
 // # Пример использования
