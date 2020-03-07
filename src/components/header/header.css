@@ -3,6 +3,13 @@
   padding-left: 10px;
 }
 
+.header > ul {
+  margin: 0;
+  /* margin-left: auto; */
+  padding: 0;
+  list-style: none;
+}
+
 .header ul li {
   list-style: none;
   margin: 0;
@@ -12,6 +19,11 @@
 
 .header ul li:hover {
   background-color: #444;
+}
+
+.header h3 {
+  flex-shrink: 0;
+  margin-right: 2rem;
 }
 
 .header a:hover {
@@ -24,4 +36,13 @@
 
 .header h3 a:hover {
   color: #00bc8c;
+}
+
+.header ul li a.active {
+  color: white;
+}
+
+.header button {
+  margin-left: auto;
+  align-self: flex-start;
 }
