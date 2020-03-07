@@ -1,38 +1,36 @@
-import React, { Component } from 'react';
-import { StarshipList, StarshipDetails } from '../sw-components';
-import Row from '../row';
-import ErrorBoundry from '../error-boundry';
+import React from 'react';
+import { StarshipList } from '../sw-components';
 
 // # Компонент обертка, объединяющая в себе весь функционал для показа
-export default class StarshipPage extends Component {
-  state = {
-    // Выбранный первоначально id персонажа или null
-    selectedItem: 5,
-  };
 
-  // * Обработчик события по персонажу
-  onPersonSelected = (id) => {
-    this.setState({
-      selectedItem: id,
-    });
-  };
+/*
+  ! Абсолютный пусть: `/startships/${id}`;
+  ! Относительный путь: просто передать id
 
-  render() {
-    // Лучше выносить компонент в переменную, когда он разрастается
-    // * Вся внутрення реализация скрыта внутри item-list.js
-    const itemList = <StarshipList onItemSelected={this.onPersonSelected} />;
+  Для того чтобы использовать относительный путь, а не прописывать
+  history.push(`/startships/${id}`)
+  необходимо использовать
+    в Header to='/startships/' - в конце /
+      Иначе получиться, что при переходе по id
+       Относительный: /startships + id = /id
+*/
 
-    // # Паттерн React: Передача свойств через Children (ErrorBoundry)
-    // Декларативно контролировать момент появления ошибки,
-    // оборачивая компоненты данным классом
+const StarshipPage = ({ history }) => {
+  /*
+    В props пропсы к StarshipPage автоматически
+    передается из Route: match, location и history
 
-    const details = (
-      <ErrorBoundry>
-        <StarshipDetails itemId={this.state.selectedItem} />
-      </ErrorBoundry>
-    );
+    id - закодирован в url страницы.
 
-    // # Паттерн React: Передача в свойствах React элементы
-    return <Row left={itemList} right={details} />;
-  }
-}
+    Для того чтобы получить id - и передать его url страницы:
+      onItemSelected передает функцию через HOC
+      внутрь ItemList - переданная функция вызывается по нажатию по li
+      возвращая id нажатой планеты, согласно которому создается новый path
+      и передается в history.push(id) - добавляя элемент в историю браузера,
+      тем самым переводя браузер на "Новую страницу"
+  */
+
+  return <StarshipList onItemSelected={(id) => history.push(id)} />;
+};
+
+export default StarshipPage;
