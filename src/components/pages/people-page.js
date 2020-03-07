@@ -87,7 +87,7 @@ import ErrorBoundry from '../error-boundry';
 export default class PeoplePage extends Component {
   state = {
     // Выбранный первоначально id персонажа или null
-    selectedItem: 3,
+    selectedItem: null,
   };
 
   // * Обработчик события по персонажу
