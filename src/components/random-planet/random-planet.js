@@ -26,7 +26,7 @@ import './random-planet.css';
 export default class RandomPlanet extends Component {
   // * Свойства по умолчанию
   static defaultProps = {
-    updateInterval: 100000,
+    updateInterval: 10000,
   };
 
   // * Валидация типов входящих props
