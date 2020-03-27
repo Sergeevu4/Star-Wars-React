@@ -6,7 +6,7 @@ import { PeoplePage, PlanetsPage, StarshipsPage, LoginPage, SecretPage } from '.
 import SwapiService from '../../services/swapi-service';
 import MockSwapiService from '../../services/mock-swapi-service';
 import ErrorBoundry from '../error-boundry';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 
 import './app.css';
 
