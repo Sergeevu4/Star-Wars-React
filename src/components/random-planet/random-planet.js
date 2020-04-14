@@ -26,7 +26,7 @@ import './random-planet.css';
 export default class RandomPlanet extends Component {
   // * Свойства по умолчанию
   static defaultProps = {
-    updateInterval: 10000,
+    updateInterval: 2000,
   };
 
   // * Валидация типов входящих props
@@ -92,10 +92,7 @@ export default class RandomPlanet extends Component {
     // Math.random Возвращает 0 до 0.99
     const id = Math.floor(Math.random() * 25) + 3;
 
-    this.swapiService
-      .getPlanet(id)
-      .then(this.onPlanetLoaded)
-      .catch(this.onError);
+    this.swapiService.getPlanet(id).then(this.onPlanetLoaded).catch(this.onError);
   };
 
   // Как только компонент инициализируется, происходит загрузка данных
