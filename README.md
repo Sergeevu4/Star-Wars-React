@@ -2,7 +2,7 @@
 
 ### API
 
-- [Данные](https://swapi.co/)
+- [Данные](https://swapi.dev/)
 - [Изображения](https://starwars-visualguide.com/)
 
 ### Функционал:
