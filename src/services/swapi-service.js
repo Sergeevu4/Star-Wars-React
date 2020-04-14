@@ -18,8 +18,7 @@
 // # Класс клиент для работы с сетевыми запросами
 export default class SwapiService {
   // Приватная часть, которую нельзя менять и использовать снаружи
-  // _apiBase = 'https://swapi.co/api'; // Публичное поле
-  _apiBase = 'http://apxuapi.herokuapp.com/api';
+  _apiBase = 'https://swapi.dev/api'; // Публичное поле
 
   // Адрес для получения картинок
   _imageBase = 'https://starwars-visualguide.com/assets/img';
