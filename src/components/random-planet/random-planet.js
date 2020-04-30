@@ -26,7 +26,7 @@ import './random-planet.css';
 export default class RandomPlanet extends Component {
   // * Свойства по умолчанию
   static defaultProps = {
-    updateInterval: 2000,
+    updateInterval: 5000,
   };
 
   // * Валидация типов входящих props
@@ -132,20 +132,13 @@ export default class RandomPlanet extends Component {
 
 // # Приватный компонент (только внутри random-planet)
 const PlanetView = ({ planet }) => {
-  const { id, name, population, rotationPeriod, diameter } = planet;
-
-  // картинки с id больше 21 20
-  const NO_IMAGES_ID = +id >= 22 || +id === 20;
-
-  const isImage = NO_IMAGES_ID
-    ? 'https://starwars-visualguide.com/assets/img/big-placeholder.jpg'
-    : `https://starwars-visualguide.com/assets/img/planets/${id}.jpg`;
+  const { image, name, population, rotationPeriod, diameter } = planet;
 
   return (
     // * Для группировки элементов
     // Можно заменить массив: return [jsx - теги ]
     <React.Fragment>
-      <img className='planet-image' src={isImage} alt={name} />
+      <img className='planet-image' src={image} alt={name} />
       <div>
         <h4>{name}</h4>
         <ul className='list-group list-group-flush'>
