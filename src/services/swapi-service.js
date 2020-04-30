@@ -11,9 +11,9 @@
 
   ! Для получения изображений используется
   https://starwars-visualguide.com
-  В нем совпадают id c https://swapi.co/
-
+  В нем совпадают id c https://swapi.dev/
 */
+import imgNotFound from './imageNotFound.jpg';
 
 // # Класс клиент для работы с сетевыми запросами
 export default class SwapiService {
@@ -50,9 +50,29 @@ export default class SwapiService {
     this._controller.abort();
   };
 
+  // * Функция получения картинок со стороннего сервиса по id
+  async getImage(type, id) {
+    try {
+      const response = await fetch(`${this._imageBase}/${type}/${id}.jpg`);
+
+      if (!response.ok) {
+        throw new Error(
+          `Could not fetch ${this._imageBase}, received ${response.status}`
+        );
+      }
+
+      const image = await response.blob();
+      const outside = URL.createObjectURL(image);
+      return outside;
+    } catch (error) {
+      // Если картинки нет, то использоваться будет стандартная картинка
+      return imgNotFound;
+    }
+  }
+
   // * Функция по созданию id из полученного url Api
   // Так как у Api (swapi) в присланном нам объекте нету поля id
-  // Его можно получить через поле url в строке https://swapi.co/api/planets/18/
+  // Его можно получить через поле url в строке https://swapi.dev/api/planets/18/
   _extractId(item) {
     // Регулярное выражения для поиска id их url
     const isRegExp = /\/([0-9]*)\/$/;
@@ -64,12 +84,14 @@ export default class SwapiService {
   // * Функция трансформация данных от Api (Planets)
   // Преобразует получаемый объект с сервера
   // в новый объект под необходимый нам формат, и отбрасываем лишние поля
-  _transformPlanet = (planet) => {
+  _transformPlanet = async (planet) => {
     const id = this._extractId(planet);
+    // Загружаю картинку
+    const image = await this.getImage('planets', id);
 
     return {
       id,
-      image: `${this._imageBase}/planets/${id}.jpg`,
+      image,
       name: planet.name,
       population: planet.population,
       rotationPeriod: planet.rotation_period,
@@ -80,12 +102,14 @@ export default class SwapiService {
   // * Функция трансформация данных от Api (Person)
   // Преобразует получаемый объект с сервера
   // в новый объект под необходимый нам формат, и отбрасываем лишние поля
-  _transformPerson = (person) => {
+  _transformPerson = async (person) => {
     const id = this._extractId(person);
+    // Загружаю картинку
+    const image = await this.getImage('characters', id);
 
     return {
       id,
-      image: `${this._imageBase}/characters/${id}.jpg`,
+      image,
       gender: person.gender,
       name: person.name,
       birthYear: person.birth_year,
@@ -96,12 +120,14 @@ export default class SwapiService {
   // * Функция трансформация данных от Api (Startship)
   // Преобразует получаемый объект с сервера
   // в новый объект под необходимый нам формат, и отбрасываем лишние поля
-  _transformStarships = (startship) => {
+  _transformStarships = async (startship) => {
     const id = this._extractId(startship);
+    // Загружаю картинку
+    const image = await this.getImage('starships', id);
 
     return {
       id,
-      image: `${this._imageBase}/starships/${id}.jpg`,
+      image,
       name: startship.name,
       model: startship.model,
       manufacturer: startship.manufacturer,
@@ -119,8 +145,9 @@ export default class SwapiService {
 
   // * Все персонажи
   getAllPeople = async () => {
-    const people = await this.getResource(`/people/`);
-    return people.results.map(this._transformPerson);
+    const { results } = await this.getResource(`/people/`);
+    const people = await Promise.all(results.map(this._transformPerson));
+    return people;
   };
 
   // * Конкретный персонаж
@@ -131,20 +158,24 @@ export default class SwapiService {
 
   // * Все планеты
   getAllPlanets = async () => {
-    const planets = await this.getResource(`/planets/`);
-    return planets.results.map(this._transformPlanet);
+    const { results } = await this.getResource(`/planets/`);
+    const planets = await Promise.all(results.map(this._transformPlanet));
+    return planets;
   };
 
   // * Конкретная планета
   getPlanet = async (id) => {
     const planet = await this.getResource(`/planets/${id}/`);
-    return this._transformPlanet(planet);
+    const cleanPlanet = await this._transformPlanet(planet);
+
+    return cleanPlanet;
   };
 
   // * Все корабли
   getAllStarships = async () => {
-    const starships = await this.getResource(`/starships/`);
-    return starships.results.map(this._transformStarships);
+    const { results } = await this.getResource(`/starships/`);
+    const starships = await Promise.all(results.map(this._transformStarships));
+    return starships;
   };
 
   // * Конкретный корабль
@@ -153,27 +184,3 @@ export default class SwapiService {
     return this._transformStarships(ship);
   };
 }
-
-// # Пример использования
-// const swapi = new SwapiService();
-// swapi.getAllPeople().then((people) =>
-//   people.forEach((p) => {
-//     console.log(p.name);
-//   })
-// );
-
-// # Функция для работы с fetch
-// const getResource = async (url) => {
-//   const result = await fetch(url); // Жду результата
-//   // Если ответа от сервера приходит не -> 200
-//   if (!result.ok) {
-//     throw new Error(`Could not fetch ${url}, received ${result.status}`);
-//   }
-
-//   const body = await result.json(); // Получаю объект
-//   return body;
-// };
-
-// getResource('https://swapi.co/api/people/1/')
-//   .then((body) => console.log(body))
-//   .catch((err) => console.error('Could not fetch', err));
