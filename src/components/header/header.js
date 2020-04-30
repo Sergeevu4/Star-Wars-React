@@ -14,38 +14,30 @@ const Header = ({ onServiceChange }) => {
   return (
     <div className='header d-flex'>
       <h3>
-        <Link to='/'>Star Wars</Link>
+        <NavLink to='/' exact>
+          Star Wars
+        </NavLink>
       </h3>
 
       <ul className='row'>
         <li>
-          <NavLink to='/people/' activeClassName='active'>
-            People
-          </NavLink>
+          <NavLink to='/people/'>People</NavLink>
         </li>
 
         <li>
-          <NavLink to='/planets/' activeClassName='active'>
-            Planets
-          </NavLink>
+          <NavLink to='/planets/'>Planets</NavLink>
         </li>
 
         <li>
-          <NavLink to='/startships/' activeClassName='active'>
-            Starships
-          </NavLink>
+          <NavLink to='/startships/'>Starships</NavLink>
         </li>
 
         <li>
-          <NavLink to='/login' activeClassName='active'>
-            Login
-          </NavLink>
+          <NavLink to='/login'>Login</NavLink>
         </li>
 
         <li>
-          <NavLink to='/secret' activeClassName='active'>
-            Secret
-          </NavLink>
+          <NavLink to='/secret'>Secret</NavLink>
         </li>
       </ul>
 
